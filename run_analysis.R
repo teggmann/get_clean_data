@@ -41,7 +41,7 @@ x_train$Activity <- y_train_activity$Activity
 
 ## merge x_test with x_train
 x_measurement <- rbind(x_test, x_train)
-write.csv(x_measurement, file = "x.csv")
+write.csv(x_measurement, file = "x.csv", row.names = FALSE)
 
 ## exctract measurement of mean and std from x_measurement
 
@@ -56,5 +56,20 @@ x_mean_std <- x_measurement[,colNames]
 x <- melt(x_mean_std, id=colName_id, measure.vars=colName_features)
 # calculate the mean
 x_mean <- ddply(x, .(SubjectNumber, Activity, variable), summarize, mean=mean(value)) 
-names(x_mean) <- c(names(x_mean[1:2]), "Features", "Average")
+names(x_mean) <- c(names(x_mean[1:2]), "Feature", "Average")
+write.csv(x_mean, file = "x_mean.csv", row.names = FALSE)
+
+## generate the codebook for x_mean
+colNames <- names(x_mean)
+colNames <- paste("* ", colNames, sep="")
+levelActivity <- levels(x_mean$Activity)
+levelActivity <- paste("    Activities:  ", levelActivity, sep="")
+levelFeatures <- levels(x_mean$Feature)
+levelFeatures <- paste("    Features:  ", levelFeatures, sep="")
+write.table(colNames, file = "codeBook.md", col.names = FALSE
+            , row.names = FALSE, quote = FALSE)
+write.table(levelActivity, file = "codeBook.md", append = TRUE
+            , col.names = FALSE, row.names = FALSE, quote = FALSE)
+write.table(levelFeatures, file = "codeBook.md", append = TRUE
+            , col.names = FALSE, row.names = FALSE, quote = FALSE)
 
